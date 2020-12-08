@@ -27,47 +27,42 @@ down_distance_updater <- function(what_down,
                                   play_by_play_data,
                                   ...){
   
-  game_id <- play_id <- ydstogo <- down <- NULL
+  game_id <- next_play_id <- NULL
   
   # down_original <- what_down
   if (yards_from_own_goal <= 5){yards_from_own_goal <- 5}
   if (yards_from_own_goal > 90){yards_to_go = 100 - yards_from_own_goal}
   if (yards_to_go >= 20){yards_to_go <- 20}
-
+  
   play_success <- FALSE
   while(play_success == FALSE){
     play <- NFLSimulatoR::sample_play(what_down,
-                yards_to_go,
-                yards_from_own_goal,
-                play_by_play_data = play_by_play_data,
-                ...)
+                                      yards_to_go,
+                                      yards_from_own_goal,
+                                      play_by_play_data = play_by_play_data,
+                                      ...)
     if(any(is.na(play$desc), identical(play$desc, character(0)))){
-      play_success <- FALSE
       yards_from_own_goal <- min(99, yards_from_own_goal + 
                                    sample(c(1, -1, 2, -2), size = 1))
+      play_success <- FALSE
+    } else if (play$play_type == "no_play") {
+      gid <- play$game_id
+      pid <- play$play_id
+      next_play <- play_by_play_data[game_id == gid, ][next_play_id == pid, ]
+      if (nrow(next_play) == 1) {
+        if (play$posteam == next_play$posteam){
+          yards_from_own_goal <- 100 - next_play$yardline_100
+          yards_to_go <- next_play$ydstogo
+          what_down <- next_play$down
+        }
+      }
+      play_success <- FALSE
     } else play_success <- TRUE
   }
-  
-  ## Fix the issue with penalties
-  next_play_no_play <- FALSE
-  if (play$play_type == "no_play") {
-    while (!next_play_no_play) {
-      tmp <- play_by_play_data[game_id == play$game_id & 
-                                 play_id > play$play_id, ][1, ] 
-      play <- tmp
-      if (play$play_type != "no_play") {
-        next_play_no_play <- TRUE
-      }
-    }
-    ## Update yfog, ydl, etc.
-    yards_from_own_goal <- play$yardline_100
-    yards_to_go <- ydstogo
-    what_down <- down
-  }
-  
+
   yard_line <- play$yardline_100
   yards_gained <- play$yards_gained
-
+  
   if(play$punt_attempt != 0 & !is.na(play$punt_attempt)){
     if(play$punt_blocked == 1){
       new_yfog <- yards_from_own_goal
@@ -77,18 +72,17 @@ down_distance_updater <- function(what_down,
       if(is.na(play$kick_distance)){
         new_yfog <- 75
       } else {
-        new_yfog <- yards_from_own_goal + play$kick_distance
+        new_yfog <- min(99, yards_from_own_goal + play$kick_distance)
       }
     }
   } else{
     new_yfog <- min(99, yards_from_own_goal + yards_gained)
-  }
-
+  }  
   new_distance <- ifelse(yards_gained >= yards_to_go & new_yfog <= 90,
-                         10,
-                         ifelse(yards_gained >= yards_to_go & new_yfog > 90,
-                                100 - new_yfog,
-                                yards_to_go - yards_gained))
+                             10,
+                             ifelse(yards_gained >= yards_to_go & new_yfog > 90,
+                                    100 - new_yfog,
+                                    yards_to_go - yards_gained))
   new_yard_line <- yard_line - yards_gained
   new_down <- ifelse(yards_gained >= yards_to_go,
                      1,
@@ -102,7 +96,7 @@ down_distance_updater <- function(what_down,
   } else if(play$is_field_goal == 1){
     points <- 3
   } else {points <- 0}
-  #if(!is.td.offense & !is.field_goal){points <- 0}
+
   return(
     data.frame(
       down_original = what_down,
@@ -129,4 +123,3 @@ down_distance_updater <- function(what_down,
     )
   )
 }
-

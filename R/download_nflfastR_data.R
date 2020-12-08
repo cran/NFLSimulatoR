@@ -1,4 +1,4 @@
-#' Download raw nflscrapR data in csv format 
+#' Download raw nflfastR data in rds format 
 #'
 #' This function will return a tibble after downloading the original file 
 #' from the nflfastR-data website. Note that the tibble will contain all 
@@ -19,4 +19,5 @@ download_nflfastR_data <- function(year){
                        ".rds",
                        sep = "")
   df <- readRDS(url(web_address))
+  return(df)
 }
