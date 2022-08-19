@@ -15,43 +15,17 @@
 
 <title>Basic Functionality in NFLSimulator</title>
 
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
 });
 </script>
 
@@ -65,28 +39,38 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -95,9 +79,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -137,13 +121,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -151,6 +142,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -351,46 +343,59 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(NFLSimulatoR)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(knitr)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">584</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NFLSimulatoR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">584</span>)</span></code></pre></div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>The <code>NFLSimulatoR</code> package provides an array of functions to enable the simulation of plays/drives and evaluate game-play strategies in the National Football League (NFL). This vignette demonstrates the basics of using the package.</p>
+<p>The <code>NFLSimulatoR</code> package provides an array of functions
+to enable the simulation of plays/drives and evaluate game-play
+strategies in the National Football League (NFL). This vignette
+demonstrates the basics of using the package.</p>
 </div>
 <div id="downloading-and-prepping-the-data" class="section level2">
 <h2>Downloading and Prepping the Data</h2>
-<p>The package provides functions for downloading play-by-play data from both <a href="https://ryurko.github.io/nflscrapR-data/"><code>nflscrapR</code></a> and <a href="https://github.com/guga31bb/nflfastR-data"><code>nflfastR</code></a> by year. The <code>prep_pbp_data()</code> function will then clean and prepare the data for use in the sampling functions that are included in <code>NFLSimulatoR</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">pbp_data &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">download_nflscrapR_data</span>(<span class="dt">year =</span> <span class="dv">2019</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">pbp_data &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">prep_pbp_data</span>(pbp_data)</a></code></pre></div>
-<p>Alternatively, you can do the same using the <code>nflfastR</code> data repository.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">pbp_data &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">download_nflfastR_data</span>(<span class="dt">year =</span> <span class="dv">2019</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">pbp_data &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">prep_pbp_data</span>(pbp_data)</a></code></pre></div>
+<p>The package provides functions for downloading play-by-play data from
+both <a href="https://ryurko.github.io/nflscrapR-data/"><code>nflscrapR</code></a>
+and <a href="https://www.nflfastr.com/index.html"><code>nflfastR</code></a> by
+year. The <code>prep_pbp_data()</code> function will then clean and
+prepare the data for use in the sampling functions that are included in
+<code>NFLSimulatoR</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pbp_data <span class="ot">&lt;-</span> nflfastR<span class="sc">::</span><span class="fu">load_pbp</span>(<span class="dv">2019</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pbp_data <span class="ot">&lt;-</span> NFLSimulatoR<span class="sc">::</span><span class="fu">prep_pbp_data</span>(pbp_data)</span></code></pre></div>
+<p>Alternatively, you can do the same using the <code>nflfastR</code>
+data repository.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pbp_data <span class="ot">&lt;-</span> nflfastR<span class="sc">::</span><span class="fu">load_pbp</span>(<span class="dv">2019</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pbp_data <span class="ot">&lt;-</span> NFLSimulatoR<span class="sc">::</span><span class="fu">prep_pbp_data</span>(pbp_data)</span></code></pre></div>
 </div>
 <div id="basic-sample-play" class="section level2">
 <h2>Basic Sample Play</h2>
-<p>The <code>NFLSimulatoR::sample_play()</code> function is the basic building block for contructing hypothethical drives and/or evaluating strategies. The function simply returns a random play from the play-by-play data for a given down, distance, and yards from the team’s goal, using the usual NFL-coaching strategy.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">play &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">sample_play</span>(</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">  <span class="dt">what_down =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">yards_to_go =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">yards_from_own_goal =</span> <span class="dv">45</span>,</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="dt">play_by_play_data =</span> pbp_data,</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">  <span class="dt">strategy =</span> <span class="st">&quot;normal&quot;</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">knitr<span class="op">::</span><span class="kw">kable</span>(play[, <span class="kw">c</span>(<span class="st">&quot;desc&quot;</span>,</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">                      <span class="st">&quot;down&quot;</span>,</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">                      <span class="st">&quot;ydstogo&quot;</span>,</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">                      <span class="st">&quot;yardline_100&quot;</span>,</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">                      <span class="st">&quot;play_type&quot;</span>,</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">                      <span class="st">&quot;yards_gained&quot;</span>)])</a></code></pre></div>
-<table>
+<p>The <code>NFLSimulatoR::sample_play()</code> function is the basic
+building block for contructing hypothethical drives and/or evaluating
+strategies. The function simply returns a random play from the
+play-by-play data for a given down, distance, and yards from the team’s
+goal, using the usual NFL-coaching strategy.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>play <span class="ot">&lt;-</span> NFLSimulatoR<span class="sc">::</span><span class="fu">sample_play</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">what_down =</span> <span class="dv">3</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_to_go =</span> <span class="dv">2</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_from_own_goal =</span> <span class="dv">45</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">play_by_play_data =</span> pbp_data,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;normal&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(play[, <span class="fu">c</span>(<span class="st">&quot;desc&quot;</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;down&quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;ydstogo&quot;</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yardline_100&quot;</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;play_type&quot;</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yards_gained&quot;</span>)])</span></code></pre></div>
+<table style="width:100%;">
 <colgroup>
-<col width="65%"></col>
-<col width="3%"></col>
-<col width="5%"></col>
-<col width="9%"></col>
-<col width="7%"></col>
-<col width="9%"></col>
+<col width="56%" />
+<col width="4%" />
+<col width="7%" />
+<col width="11%" />
+<col width="8%" />
+<col width="11%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -404,91 +409,110 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">(10:29) (No Huddle, Shotgun) K.Cousins pass deep middle to S.Diggs for 54 yards, TOUCHDOWN.</td>
+<td align="left">(8:20) 27-K.Hunt right guard to PIT 47 for 7 yards
+(90-T.Watt).</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">54</td>
+<td align="left">run</td>
+<td align="right">7</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see in this example, Kirk Cousins threw a touchdown pass
+to Stefon Diggs on third down and two from the Minnesota 46 yard line.
+Note that we were sampling from the MN 45 yard line in the function
+call, however, we include a window argument
+(<code>window_yards_from_own_goal</code>) in the
+<code>sample_play()</code> function with a default set to one yard.</p>
+</div>
+<div id="sample-play-specified-passrush-blend" class="section level2">
+<h2>Sample Play Specified Pass/Rush Blend</h2>
+<p>We can also sample plays according to a given pass/rush play
+strategy. The user may choose a value for the proportion of passing
+plays to be sampled. Thus one can test strategies in which the team
+always passes, always runs, or some distribution of the two. This
+strategy is only intended for downs 1 - 3, and uses an empirical
+strategy for fourth downs.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>play <span class="ot">&lt;-</span> NFLSimulatoR<span class="sc">::</span><span class="fu">sample_play</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">what_down =</span> <span class="dv">3</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_to_go =</span> <span class="dv">2</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_from_own_goal =</span> <span class="dv">45</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">play_by_play_data =</span> pbp_data,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;passes_rushes&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prop_passes =</span> <span class="fl">0.5</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(play[, <span class="fu">c</span>(<span class="st">&quot;desc&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;down&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;ydstogo&quot;</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yardline_100&quot;</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;play_type&quot;</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yards_gained&quot;</span>)])</span></code></pre></div>
+<table>
+<colgroup>
+<col width="65%" />
+<col width="3%" />
+<col width="5%" />
+<col width="9%" />
+<col width="6%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">desc</th>
+<th align="right">down</th>
+<th align="right">ydstogo</th>
+<th align="right">yardline_100</th>
+<th align="left">play_type</th>
+<th align="right">yards_gained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(7:56) (Shotgun) 14-R.Fitzpatrick pass incomplete deep
+left to 88-M.Gesicki (30-J.Bates III).</td>
 <td align="right">3</td>
 <td align="right">2</td>
 <td align="right">54</td>
 <td align="left">pass</td>
-<td align="right">54</td>
-</tr>
-</tbody>
-</table>
-<p>As you can see in this example, Kirk Cousins threw a touchdown pass to Stefon Diggs on third down and two from the Minnesota 46 yard line. Note that we were sampling from the MN 45 yard line in the function call, however, we include a window argument (<code>window_yards_from_own_goal</code>) in the <code>sample_play()</code> function with a default set to one yard.</p>
-</div>
-<div id="sample-play-specified-passrush-blend" class="section level2">
-<h2>Sample Play Specified Pass/Rush Blend</h2>
-<p>We can also sample plays according to a given pass/rush play strategy. The user may choose a value for the proportion of passing plays to be sampled. Thus one can test strategies in which the team always passes, always runs, or some distribution of the two. This strategy is only intended for downs 1 - 3, and uses an empirical strategy for fourth downs.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">play &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">sample_play</span>(</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">  <span class="dt">what_down =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">  <span class="dt">yards_to_go =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">  <span class="dt">yards_from_own_goal =</span> <span class="dv">45</span>,</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">  <span class="dt">play_by_play_data =</span> pbp_data,</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">  <span class="dt">strategy =</span> <span class="st">&quot;passes_rushes&quot;</span>,</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">  <span class="dt">prop_passes =</span> <span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">)</a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">knitr<span class="op">::</span><span class="kw">kable</span>(play[, <span class="kw">c</span>(<span class="st">&quot;desc&quot;</span>,</a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">                      <span class="st">&quot;down&quot;</span>,</a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">                      <span class="st">&quot;ydstogo&quot;</span>,</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12">                      <span class="st">&quot;yardline_100&quot;</span>,</a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">                      <span class="st">&quot;play_type&quot;</span>,</a>
-<a class="sourceLine" id="cb5-14" data-line-number="14">                      <span class="st">&quot;yards_gained&quot;</span>)])</a></code></pre></div>
-<table>
-<colgroup>
-<col width="67%"></col>
-<col width="3%"></col>
-<col width="5%"></col>
-<col width="8%"></col>
-<col width="6%"></col>
-<col width="8%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">desc</th>
-<th align="right">down</th>
-<th align="right">ydstogo</th>
-<th align="right">yardline_100</th>
-<th align="left">play_type</th>
-<th align="right">yards_gained</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(11:16) (Shotgun) A.Rodgers pass short left to D.Adams ran ob at MIN 45 for 11 yards (Mac.Alexander).</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">56</td>
-<td align="left">pass</td>
-<td align="right">11</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="sample-play-fourth-down-strategies" class="section level2">
 <h2>Sample Play Fourth Down Strategies</h2>
-<p>This package also offers a way to sample various fourth down strategies. The user may choose from the following: empirical, always going for it on fourth down, never going for it on fourth down, go for it if one is less than a certain distance from a first down/touchdown, and go for it if it maximizes one’s expected points.The specific fourth down strategy is passed in to the <code>fourth_down_strategy</code> argument. The <code>yds_less_than</code> strategy takes an additional argument for the distance to from a first down parameter.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">play &lt;-<span class="st"> </span><span class="kw">sample_play</span>(</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="dt">what_down =</span> <span class="dv">4</span>,</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">  <span class="dt">yards_to_go =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">  <span class="dt">yards_from_own_goal =</span> <span class="dv">45</span>,</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">  <span class="dt">play_by_play_data =</span> pbp_data,</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">  <span class="dt">strategy =</span> <span class="st">&quot;fourth_downs&quot;</span>,</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">  <span class="dt">fourth_down_strategy =</span> <span class="st">&quot;yds_less_than&quot;</span>,</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">  <span class="dt">yards_less_than =</span> <span class="dv">5</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">knitr<span class="op">::</span><span class="kw">kable</span>(play[, <span class="kw">c</span>(<span class="st">&quot;desc&quot;</span>,</a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">                      <span class="st">&quot;down&quot;</span>,</a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">                      <span class="st">&quot;ydstogo&quot;</span>,</a>
-<a class="sourceLine" id="cb6-13" data-line-number="13">                      <span class="st">&quot;yardline_100&quot;</span>,</a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">                      <span class="st">&quot;play_type&quot;</span>,</a>
-<a class="sourceLine" id="cb6-15" data-line-number="15">                      <span class="st">&quot;yards_gained&quot;</span>)])</a></code></pre></div>
-<table style="width:100%;">
+<p>This package also offers a way to sample various fourth down
+strategies. The user may choose from the following: empirical, always
+going for it on fourth down, never going for it on fourth down, go for
+it if one is less than a certain distance from a first down/touchdown,
+and go for it if it maximizes one’s expected points.The specific fourth
+down strategy is passed in to the <code>fourth_down_strategy</code>
+argument. The <code>yds_less_than</code> strategy takes an additional
+argument for the distance to from a first down parameter.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>play <span class="ot">&lt;-</span> <span class="fu">sample_play</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">what_down =</span> <span class="dv">4</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_to_go =</span> <span class="dv">2</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_from_own_goal =</span> <span class="dv">45</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">play_by_play_data =</span> pbp_data,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;fourth_downs&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fourth_down_strategy =</span> <span class="st">&quot;yds_less_than&quot;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">yards_less_than =</span> <span class="dv">5</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(play[, <span class="fu">c</span>(<span class="st">&quot;desc&quot;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;down&quot;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;ydstogo&quot;</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yardline_100&quot;</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;play_type&quot;</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;yards_gained&quot;</span>)])</span></code></pre></div>
+<table>
 <colgroup>
-<col width="62%"></col>
-<col width="3%"></col>
-<col width="6%"></col>
-<col width="10%"></col>
-<col width="7%"></col>
-<col width="10%"></col>
+<col width="64%" />
+<col width="3%" />
+<col width="5%" />
+<col width="9%" />
+<col width="7%" />
+<col width="9%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -502,7 +526,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">(2:00) (Shotgun) R.Wilson pass incomplete short left to DK.Metcalf (E.Moseley).</td>
+<td align="left">(2:00) (Shotgun) 3-R.Wilson pass incomplete short left
+to 14-DK.Metcalf (41-E.Moseley).</td>
 <td align="right">3</td>
 <td align="right">2</td>
 <td align="right">55</td>
@@ -514,19 +539,23 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="sample-drives-function" class="section level2">
 <h2>Sample Drives Function</h2>
-<p>Now, we can utilize the above sample play functions to simulate full drives using the <code>sample_drives()</code> function. The strategy options are the same as <code>sample_play()</code> with varying parameters based on the chosen strategy. The function also offers the option to simulate one single possession or until one team scores.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">drives &lt;-<span class="st"> </span>NFLSimulatoR<span class="op">::</span><span class="kw">sample_drives</span>(</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="dt">n_sims =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="dt">from_yard_line =</span> <span class="dv">25</span>,</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="dt">play_by_play_data =</span> pbp_data,</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="dt">strategy =</span> <span class="st">&quot;fourth_downs&quot;</span>,</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">  <span class="dt">fourth_down_strategy =</span> <span class="st">&quot;empirical&quot;</span>,</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">  <span class="dt">single_drive =</span> T,</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">  <span class="dt">progress =</span> F <span class="co">#shows progress bar for simulations</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">drives<span class="op">$</span>points</a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 7 0 0 0</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; [39] 0 0 0 0 0 0 0 0 7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 0 0 0 0</span></a></code></pre></div>
+<p>Now, we can utilize the above sample play functions to simulate full
+drives using the <code>sample_drives()</code> function. The strategy
+options are the same as <code>sample_play()</code> with varying
+parameters based on the chosen strategy. The function also offers the
+option to simulate one single possession or until one team scores.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>drives <span class="ot">&lt;-</span> NFLSimulatoR<span class="sc">::</span><span class="fu">sample_drives</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_sims =</span> <span class="dv">10</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">from_yard_line =</span> <span class="dv">25</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">play_by_play_data =</span> pbp_data,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;fourth_downs&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fourth_down_strategy =</span> <span class="st">&quot;empirical&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">single_drive =</span> T,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">progress =</span> F <span class="co">#shows progress bar for simulations</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>drives<span class="sc">$</span>points</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 0 0 0 0 0 0</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [39] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 0 0 0 0 0 3</span></span></code></pre></div>
 </div>
 
 

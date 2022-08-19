@@ -9,12 +9,12 @@ library(NFLSimulatoR)
 library(knitr)
 set.seed(584)
 
-## -----------------------------------------------------------------------------
-pbp_data <- NFLSimulatoR::download_nflscrapR_data(year = 2019)
+## ---- message = FALSE, warning = FALSE----------------------------------------
+pbp_data <- nflfastR::load_pbp(2019)
 pbp_data <- NFLSimulatoR::prep_pbp_data(pbp_data)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  pbp_data <- NFLSimulatoR::download_nflfastR_data(year = 2019)
+#  pbp_data <- nflfastR::load_pbp(2019)
 #  pbp_data <- NFLSimulatoR::prep_pbp_data(pbp_data)
 
 ## -----------------------------------------------------------------------------
